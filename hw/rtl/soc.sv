@@ -46,9 +46,10 @@ logic        trap;        // Indicates an untrapped processor fault.
 // Memory map
 //------------------------------------------------------------------------------
 localparam SRAM_SIZE = (1 << (WORD_ADDRESS_WIDTH + 2));   
-localparam GPO_BASE   = PERIPH_BASE_ADDR+'h00;            
-localparam UART_BASE =   PERIPH_BASE_ADDR+'h40;           
-localparam TIM_BASE =   PERIPH_BASE_ADDR+'h80;            
+localparam GPO_BASE   = PERIPH_BASE_ADDR  +'h00;            
+localparam UART_BASE =   PERIPH_BASE_ADDR +'h40;           
+localparam TIM_BASE =   PERIPH_BASE_ADDR  +'h80;  
+localparam I2C_BASE =   PERIPH_BASE_ADDR  +'hC0;          
 
 //------------------------------------------------------------------------------
 // PicoRV32 RISC V soft core processor (https://github.com/YosysHQ/picorv32)
@@ -92,7 +93,7 @@ assign trap_o = trap;
 //------------------------------------------------------------------------------
 // Address decoding - module select based on address being accessed
 //------------------------------------------------------------------------------
-logic sram_sel, gpo_sel, uart_sel, timer_sel;
+logic sram_sel, gpo_sel, uart_sel, timer_sel, i2c_sel;
 
 // SRAM selector (stating at 0x00000000)
 assign sram_sel =  mem_valid && (mem_addr  < SRAM_SIZE);  
@@ -100,22 +101,24 @@ assign sram_sel =  mem_valid && (mem_addr  < SRAM_SIZE);
 // Peripheral selectors (starting at 0x80000000)
 assign gpo_sel =   mem_valid && (mem_addr >= GPO_BASE && mem_addr < UART_BASE);
 assign uart_sel = mem_valid && (mem_addr >= UART_BASE && mem_addr < TIM_BASE);
-assign timer_sel = mem_valid && (mem_addr >= TIM_BASE && mem_addr <= TIM_BASE+'h40);
+assign timer_sel = mem_valid && (mem_addr >= TIM_BASE && mem_addr < I2C_BASE);
+assign i2c_sel = mem_valid && (mem_addr >= I2C_BASE && mem_addr < I2C_BASE + 'h40);
 
 //------------------------------------------------------------------------------
 // Read data multiplexing
 //------------------------------------------------------------------------------
-logic sram_rdy, gpo_rdy, uart_rdy, timer_rdy;
-logic [31:0] sram_rdata,uart_rdata, gpo_rdata, timer_rdata;
+logic sram_rdy, gpo_rdy, uart_rdy, timer_rdy, i2c_rdy;
+logic [31:0] sram_rdata,uart_rdata, gpo_rdata, timer_rdata, i2c_rdata;
 
 // Data access complete
-assign mem_ready = mem_valid && (sram_rdy | gpo_rdy | uart_rdy | timer_rdy);
+assign mem_ready = mem_valid && (sram_rdy | gpo_rdy | uart_rdy | timer_rdy | i2c_rdy);
 
 // Select the correct read data bus
 assign mem_rdata =  sram_sel ? sram_rdata  :                     
                     gpo_sel ? gpo_rdata :
                     uart_sel ? uart_rdata : 
                     timer_sel ? timer_rdata :
+                    i2c_sel ? i2c_rdata :
                     32'h0;                 
 
 //------------------------------------------------------------------------------
@@ -188,6 +191,23 @@ timer #(.MCU_FREQ(MCU_FREQ)) tim
   .mem_wstrb_i(mem_wstrb),
   .mem_wdata_i(mem_wdata),
   .mem_rdata_o(timer_rdata)
+);
+
+//------------------------------------------------------------------------------
+// I2C module
+//------------------------------------------------------------------------------
+i2c i2c
+(
+  .clk_i(clk_i),
+  .rst_ni(rst_ni),
+  .clk_mcu_i(clk_mcu_i),                
+  .rst_mcu_ni(rst_mcu_ni),  
+  .select_i(i2c_sel),  
+  .mem_ready_o(i2c_rdy),
+  .mem_addr_i(mem_addr),
+  .mem_wstrb_i(mem_wstrb),
+  .mem_wdata_i(mem_wdata),
+  .mem_rdata_o(i2c_rdata)
 );
 
 //------------------------------------------------------------------------------

@@ -4,7 +4,10 @@
 #ifndef __DRV_H__
 #define __DRV_H__
 
+#include <stdbool.h>
+
 #include "bsp.h"
+
 
 /* ----- GPO peripheral driver --------------------------------------------------- */
 
@@ -35,11 +38,6 @@ static inline void GPO_SetPin(GPO_t *gpo, uint32_t pin_mask)
 static inline void GPO_ClearPin(GPO_t *gpo, uint32_t pin_mask)
 {
   WRITE_REG(gpo->BSR, pin_mask << 16U);
-}
-
-static inline void GPO_TogglePin(GPO_t *gpo, uint32_t pin_mask)
-{
-  WRITE_REG(gpo->BSR, ((READ_REG(gpo->BSR) & pin_mask) << 16U) | (~READ_REG(gpo->BSR) & pin_mask));
 }
 
 /* ----- UART peripheral driver --------------------------------------------------- */

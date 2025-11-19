@@ -59,11 +59,10 @@ add_custom_command(TARGET ${TARGET} POST_BUILD
   COMMAND ${CMAKE_OBJDUMP} -d -S ${TARGET} > ${TARGET}.s
   COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR} 
           python3 ${PROJECT_SOURCE_DIR}/tools/bin_to_hex.py ${TARGET}.bin
-COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/firmware_b0.hex ${PROJECT_SOURCE_DIR}/../hw/handover/firmware_b0.hex
   # Copy hex files to location expected by FPGA build
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/firmware_b0.hex ${PROJECT_SOURCE_DIR}/../hw/handover/firmware_b0.hex
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/firmware_b1.hex ${PROJECT_SOURCE_DIR}/../hw/handover/firmware_b1.hex
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/firmware_b2.hex ${PROJECT_SOURCE_DIR}/../hw/handover/firmware_b2.hex
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/firmware_b3.hex ${PROJECT_SOURCE_DIR}/../hw/handover/firmware_b3.hex
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/firmware_b0.hex ${PROJECT_SOURCE_DIR}/../hw/handoff/firmware_b0.hex
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/firmware_b1.hex ${PROJECT_SOURCE_DIR}/../hw/handoff/firmware_b1.hex
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/firmware_b2.hex ${PROJECT_SOURCE_DIR}/../hw/handoff/firmware_b2.hex
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/firmware_b3.hex ${PROJECT_SOURCE_DIR}/../hw/handoff/firmware_b3.hex
 )
 

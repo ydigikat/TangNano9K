@@ -172,7 +172,8 @@ set RTL_FILES [list \
     "$RTL_DIR/mmio/sram/sram.sv" \
     "$RTL_DIR/mmio/sram/sram_blk.sv" \
     "$RTL_DIR/mmio/gpo/gpo.sv" \
-    "$RTL_DIR/mmio/timer/timer.sv"
+    "$RTL_DIR/mmio/timer/timer.sv" \
+    "$RTL_DIR/mmio/i2c/i2c.sv" 
 ]
 
 # Files to exclude from linting (vendor primitives, etc)

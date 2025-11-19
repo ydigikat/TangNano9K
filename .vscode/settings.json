@@ -20,12 +20,11 @@
   "[verilog]": {"editor.defaultFormatter": "mshr-h.veriloghdl"},  
 
   // Minimal CPP setup for risv32i (picorv32)
-  "C_Cpp.intelliSenseEngine": "default",
-  //"C_Cpp.autocomplete": "disabled",
-  "C_Cpp.errorSquiggles": "disabled",
-  //"C_Cpp.formatting": "disabled",  
+  "C_Cpp.intelliSenseEngine": "default",  
+  // "C_Cpp.errorSquiggles": "disabled",  
 
   // Others
   "better-comments.highlightPlainText": true,
-  "cmake.sourceDirectory": "/workspaces/Varia/sw"
+  "cmake.sourceDirectory": "/workspaces/tangnano9k/sw",
+  "cmake.ignoreCMakeListsMissing": true
 }

@@ -1,7 +1,7 @@
 # Build outputs - temporary project created by gw_sh
 project/
 build/
-handover/
+handoff/
 
 # Analog discovery files
 *.dwf3logic
