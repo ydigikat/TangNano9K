@@ -48,6 +48,13 @@ typedef struct
   __O uint32_t HI;     /* Counter high word */
 } TIMER_t;
 
+typedef struct 
+{
+  __IO uint32_t CR;    /* Control register */
+  __I uint32_t SR;     /* Status reigster  */
+} I2C_t;
+
+
 /* Memory map */
 #define SRAM_BASE (0x00000000UL)
 #define PERIPH_BASE (0x80000000UL)
@@ -56,11 +63,13 @@ typedef struct
 #define GPO_BASE (PERIPH_BASE + 0x00UL)
 #define UART_BASE (PERIPH_BASE + 0x40UL)
 #define TIMER_BASE (PERIPH_BASE + 0x80UL)
+#define I2C_BASE (PERIPH_BASE + 0xC0UL)
 
 /* MMIO declarations */
 #define GPO ((GPO_t *) GPO_BASE)
 #define UART ((UART_t *) UART_BASE)
 #define TIMER ((TIMER_t *) TIMER_BASE)
+#define I2C ((I2C_t *)) I2C_BASE)
 
 
 /* ----- GPO REGISTERS ----------------------------------------------------------------- */
@@ -126,7 +135,6 @@ typedef struct
 #define UART_SR_TDR_Pos (0U)
 #define UART_SR_TDR_Msk (0x1UL << UART_SR_TDR_Pos) /* 0x00000001 */
 #define UART_SR_TDR (UART_SR_TDR_Msk)              /* [0] Ready for TX */
-
 #define UART_SR_RDR_Pos (1U)
 #define UART_SR_RDR_Msk (0x1UL << UART_SR_RDR_Pos) /* 0x00000002 */
 #define UART_SR_RDR (UART_SR_RDR_Msk)              /* [1] Ready for RX */
@@ -135,6 +143,11 @@ typedef struct
 #define UART_TD_DB_Pos (0U)
 #define UART_TD_DB_Msk (0xFFUL << TRACE_TD_DB_Pos)  /* 0x000000FF*/
 #define UART_TD_DB (TRACE_TD_DB_Msk)                /* [7:0] output data byte */
+
+/* Data register, serial data in */
+#define UART_RD_DB_Pos (0U)
+#define UART_RD_DB_Msk (0xFFUL << TRACE_RD_DB_Pos)  /* 0x000000FF*/
+#define UART_RD_DB (TRACE_RD_DB_Msk)                /* [7:0] input data byte */
 
 /* ----- TIMER REGISTERS ----------------------------------------------------------------- */
 
@@ -145,6 +158,10 @@ typedef struct
 #define TIMER_CR_CLR_Pos (1U)
 #define TIMER_CR_CLR_Msk (0x1UL << TIMER_CR_CLR_Pos)
 #define TIMER_CR_CLR (TIMER_CR_CLR_Msk)             /* [1] clear timer counter */
+
+/* ----- I2C REGISTERS ----------------------------------------------------------------- */
+
+/* Control register */
 
 #endif /* __BSP_H__ */
 

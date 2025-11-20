@@ -25,7 +25,7 @@ SECTIONS
     .text : {
         . = ALIGN(4);
         *(.text.start)      /* Startup code first */
-        *(.text*)           /* All code */
+        *(.text*)           /* Other code */
         . = ALIGN(4);
     } > ram :text
 
@@ -60,7 +60,7 @@ SECTIONS
     .stack (NOLOAD) : {
         . = ALIGN(16);
         __stack_bottom = .;
-        . += 0x100;  /* Reserve minimum 256 bytes for stack checking */
+        . += 0x100;  /* Reserve 256 bytes for stack checking */
         . = ALIGN(16);
     } > ram
 
