@@ -26,5 +26,8 @@
   // Others
   "better-comments.highlightPlainText": true,
   "cmake.sourceDirectory": "/workspaces/tangnano9k/sw",
-  "cmake.ignoreCMakeListsMissing": true
+  "cmake.ignoreCMakeListsMissing": true,
+  "files.associations": {
+    "stddef.h": "c"
+  }
 }

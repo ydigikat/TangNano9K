@@ -10,8 +10,11 @@ module tangnano9k_top (
     output      logic        ftdi_o,
     input `VAR  logic        midi_i,
     output      logic[4:0]   led_o,    
-    output      logic        led_trap_o,
-    output      logic[15:0]  dio_o      
+    output      logic        led_trap_o,    
+    output      logic        i2c_scl_o,
+    inout       tri          i2c_sda_io,
+
+    output      logic[15:0]  dio_o 
 );
 
   localparam MCU_FREQ=16_000_000;

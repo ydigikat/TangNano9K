@@ -2,45 +2,28 @@
 // Jason Wilden 2025
 //-----------------------------------------------------------------------------
 #include "drv.h"
-#include "serial.h"
+#include "trace.h"
 
-uint32_t x;
+extern void board_init();
 
 int main(void)
-{
-  x = 0;
-
-  /* Write test pattern to onboard LEDs */
-  GPO_SetPin(GPO, GPO_PIN_0 | GPO_PIN_2 | GPO_PIN_4);  
-
-  /* Set serial out BAUD divisor */
-  UART_SetDivisor(UART, UART_DIV);
-
-  /* Clear & start timer */  
-  TIMER_Clear(TIMER);
-  TIMER_Start(TIMER);
-
+{  
   bool toggle = true;
 
+  board_init();
+
   while (1)
-  {
-  
-    serial_printf("Da value of x is %d\n", x++, 0, 0);
-    
+  { 
     TIMER_SleepUs(TIMER,500000);
     
     toggle = !toggle;
 
     if(toggle) 
-    {
-      GPO_SetPin(GPO,GPO_PIN_1);
-    }
+      GPO_SetPin(GPO,GPO_PIN_1);    
     else
-    {
       GPO_ClearPin(GPO,GPO_PIN_1);
-    }
 
-    // GPO_TogglePin(GPO,GPO_PIN_1);      
+    trace_printf("Timer is now %d\n", TIMER_ReadUs(TIMER), 0, 0);    
   }
 
   return 0;

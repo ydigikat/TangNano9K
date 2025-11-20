@@ -40,24 +40,24 @@ static inline void GPO_ClearPin(GPO_t *gpo, uint32_t pin_mask)
   WRITE_REG(gpo->BSR, pin_mask << 16U);
 }
 
-/* ----- UART peripheral driver --------------------------------------------------- */
+/* ----- TRACE peripheral driver --------------------------------------------------- */
 
-static inline void UART_SetDivisor(UART_t *uart, uint16_t div)
+static inline void UART_SetDivisor(TRACE_t *trace, uint16_t div)
 {
-  MODIFY_REG(uart->CR, UART_CR_DIV, _VAL2FLD(UART_CR_DIV, div));
+  MODIFY_REG(trace->CR, TRACE_CR_DIV, _VAL2FLD(TRACE_CR_DIV, div));
 }
 
-static inline bool UART_TransmitDataReady(UART_t *uart)
+static inline bool TRACE_TransmitDataReady(TRACE_t *trace)
 {
-  return READ_BIT(uart->SR, UART_SR_TDR);
+  return READ_BIT(trace->SR, TRACE_SR_TDR);
 }
 
-static inline void UART_PutChar(UART_t *uart, uint8_t c)
+static inline void TRACE_PutChar(TRACE_t *trace, uint8_t c)
 {
-  while (!UART_TransmitDataReady(uart))
+  while (!TRACE_TransmitDataReady(trace))
     ;
 
-  WRITE_REG(uart->TD, c);
+  WRITE_REG(trace->TD, c);
 }
 
 /* ----- Timer driver --------------------------------------------------- */
