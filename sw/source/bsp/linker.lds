@@ -6,8 +6,8 @@
 
 MEMORY
 {
-    /* 8KB SRAM starting at address 0 */
-    ram (rwx) : ORIGIN = 0x00000000, LENGTH = 8K
+    /* 16KB SRAM starting at address 0 */
+    ram (rwx) : ORIGIN = 0x00000000, LENGTH = 16K
 }
 
 /* Get rid of RWX warning, note that the picorv32 has no MPU so ignores these making

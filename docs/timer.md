@@ -14,7 +14,7 @@ HI value at the same time ensuring an atomic 64 bit value.
 |------|--------|---------|
 | 31-2 |        | unused  |
 | 1    | Write  | Clear timer counter |
-| 0    | Write  | Start timer | 
+| 0    | Write  | Start/Pause timer | 
 
 Note that clearing the start timer bit [0] will pause the timer without clearing the current value.  
 

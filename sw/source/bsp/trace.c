@@ -1,74 +1,123 @@
 //------------------------------------------------------------------------------
 // Jason Wilden 2025
 //------------------------------------------------------------------------------
-#include "trace.h"
 #include "drv.h"
 
-static inline void putchar_blocking(char c) {    
-    TRACE_PutChar(TRACE,c);
+static inline void putchar_blocking(TRACE_t *restrict trace, char c)
+{
+    TRACE_PutChar(trace, c);
 }
 
-static void print_str(const char *s) {
-    while (*s) {
-        if (*s == '\n') putchar_blocking('\r');
-        putchar_blocking(*s++);
+static void print_str(TRACE_t *restrict trace, const char *s)
+{
+    if(s == NULL)    
+        return;
+        
+    while (*s)
+    {
+        if (*s == '\n')
+            putchar_blocking(trace, '\r');
+        putchar_blocking(trace, *s++);
     }
 }
 
-static void print_hex(uint32_t val, uint8_t digits) {
+static void print_hex(TRACE_t *restrict trace, uint32_t val, uint8_t digits)
+{
     const char hex[] = "0123456789ABCDEF";
-    for (int i = (digits - 1) * 4; i >= 0; i -= 4) {
-        putchar_blocking(hex[(val >> i) & 0xF]);
+    for (int i = (digits - 1) * 4; i >= 0; i -= 4)
+    {
+        putchar_blocking(trace, hex[(val >> i) & 0xF]);
     }
 }
 
-
-static void print_dec(uint32_t val) {
-    if (val == 0) {
-        putchar_blocking('0');
+static void print_dec(TRACE_t *restrict trace, uint32_t val)
+{
+    if (val == 0)
+    {
+        putchar_blocking(trace, '0');
         return;
     }
-    
+
     char buf[10];
     int i = 0;
-    while (val) {
+    while (val)
+    {
         buf[i++] = '0' + (val % 10);
         val /= 10;
     }
-    while (i > 0) putchar_blocking(buf[--i]);
+    while (i > 0)
+        putchar_blocking(trace, buf[--i]);
 }
 
-void trace_init()
+/**
+ * i2c_init
+ * \brief Initialises the TRACE peripheral with default values.
+ */
+void trace_init(TRACE_t *restrict trace)
 {
-    UART_SetDivisor(TRACE, TRACE_DIV);
+    TRACE_SetDivisor(trace, TRACE_DIV);
 }
 
-void trace_print(const char *str)
+/**
+ * trace_print
+ * \brief Prints a string to the trace device. This calls trace_printf()
+ * \param str The string to print.
+ */
+void trace_print(TRACE_t *restrict trace, const char *str)
 {
-    trace_printf(str,0,0,0);
+    trace_printf(trace, str, 0, 0, 0);
 }
 
-void trace_printf(const char *fmt,uint32_t arg1, uint32_t arg2, uint32_t arg3) 
-{   
-    // Format string 
+/**
+ * trace_printf
+ * \brief Prints a formatted string with upto 3 parameters to the trace
+ *        device. This does not support va_args so all 3 arguments must be
+ *        supplied even if not included in output format string.
+ * \param fmt A formatting string (similar to printf)
+ * \param arg1 The first argument.
+ * \param arg2 The second argument.
+ * \param arg3 The third argument.
+ */
+void trace_printf(TRACE_t *restrict trace, const char *fmt, uint32_t arg1, uint32_t arg2, uint32_t arg3)
+{
+    // Format string
     uint32_t args[3] = {arg1, arg2, arg3};
     int arg_idx = 0;
-    
-    while (*fmt) {
-        if (*fmt == '%' && arg_idx < 3) {
+
+    while (*fmt)
+    {
+        if (*fmt == '%' && arg_idx < 3)
+        {
             fmt++;
-            switch (*fmt) {
-                case 'd': print_dec(args[arg_idx++]); break;
-                case 'x': print_hex(args[arg_idx++], 8); break;
-                case 'h': print_hex(args[arg_idx++], 4); break;  // Short hex
-                case 'b': print_hex(args[arg_idx++], 2); break;  // Byte hex
-                case 's': print_str((const char*)args[arg_idx++]); break;
-                case 'c': putchar_blocking(args[arg_idx++] & 0xFF); break;
-                default: putchar_blocking(*fmt);
+            switch (*fmt)
+            {
+            case 'd':
+                print_dec(trace, args[arg_idx++]);
+                break;
+            case 'x':
+                print_hex(trace, args[arg_idx++], 8);
+                break;
+            case 'h':
+                print_hex(trace, args[arg_idx++], 4);
+                break; // Short hex
+            case 'b':
+                print_hex(trace, args[arg_idx++], 2);
+                break; // Byte hex
+            case 's':
+                print_str(trace, (const char *)args[arg_idx++]);
+                break;
+            case 'c':
+                putchar_blocking(trace, args[arg_idx++] & 0xFF);
+                break;
+            default:
+                putchar_blocking(trace, *fmt);
             }
-        } else {
-            if (*fmt == '\n') putchar_blocking('\r');
-            putchar_blocking(*fmt);
+        }
+        else
+        {
+            if (*fmt == '\n')
+                putchar_blocking(trace, '\r');
+            putchar_blocking(trace, *fmt);
         }
         fmt++;
     }

@@ -30,7 +30,11 @@ localparam TD = 4'h02;                   // TX Data
 localparam RD = 4'h03;                   // RX Data
 
 //------------------------------------------------------------------------------
-// Determine operation
+// Determine operation.  The select_i will indicate this module is selected. The
+// MMIO is word addressed with 16 registers, mem_addr_i bits [5:2] will hold the
+// register offset.  The mem_wstrb tells us which bytes are valid in mem_wdata_i
+// however we just use it as a write enable here - if any bit is set, we must be
+// a write operation.
 //------------------------------------------------------------------------------
 logic wr_divisor, wr_uart, rd_status;
 

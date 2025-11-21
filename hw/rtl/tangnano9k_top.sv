@@ -7,7 +7,7 @@
 module tangnano9k_top (
     input `VAR  logic    clk_i,  
 
-    output      logic        ftdi_o,
+    output      logic        ftdi_o,  
     input `VAR  logic        midi_i,
     output      logic[4:0]   led_o,    
     output      logic        led_trap_o,    
@@ -42,7 +42,7 @@ module tangnano9k_top (
   logic[15:0] gpo;
 
   soc #(
-     .WORD_ADDRESS_WIDTH('d11),
+     .WORD_ADDRESS_WIDTH('d12),       // SRAM 16KB (4096 words)
      .REGS('d16),
      .MCU_FREQ(MCU_FREQ),
      .PERIPH_BASE_ADDR('h8000_0000),

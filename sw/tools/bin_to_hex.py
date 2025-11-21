@@ -54,7 +54,7 @@ def split_binary(bin_file):
     write_hex('firmware_b3.hex', b3,target_words)
     
     print(f"Split {len(data)} bytes into 4 hex files")
-    print(f"Memory words: {len(data)//4}")
+    print(f"Memory words: {len(data)//4}/4000")
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

@@ -26,9 +26,9 @@ set(CMAKE_SIZE           ${TOOLS_DIR}${TOOLS_PREFIX}size)
 # --------------------------------------------------------
 # Compiler flags (non-board-specific)
 # --------------------------------------------------------
-set(CMAKE_C_FLAGS "-march=rv32i -mabi=ilp32 -Os -Wall -Wextra -ffunction-sections -fdata-sections -ffreestanding -nostdlib")
-set(CMAKE_ASM_FLAGS "-march=rv32i -mabi=ilp32")
-set(CMAKE_EXE_LINKER_FLAGS "-march=rv32i -mabi=ilp32 -nostdlib -nostartfiles -Wl,--gc-sections")
+set(CMAKE_C_FLAGS "-march=rv32im -mabi=ilp32 -Os -Wall -Wextra -fanalyzer -ffunction-sections -fdata-sections -ffreestanding -nostdlib")
+set(CMAKE_ASM_FLAGS "-march=rv32im -mabi=ilp32")
+set(CMAKE_EXE_LINKER_FLAGS "-march=rv32im -mabi=ilp32 -nostdlib -nostartfiles -Wl,--gc-sections")
 
 # Disable try-compile attempts for cross builds
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)

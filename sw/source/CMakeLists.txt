@@ -15,12 +15,13 @@ set(SRCS_APP
 set(INCL_APP ${SRC_DIR})
 set(DEFS_APP $<$<CONFIG:DEBUG>: DEBUG>)
 
-# Board support package & drivers
+# Board support package & low/high level drivers
 set(SRCS_BSP  
   ${BSP_DIR}/trace.c
   ${BSP_DIR}/runtime.c
   ${BSP_DIR}/startup.s
   ${BSP_DIR}/board.c
+  ${BSP_DIR}/i2c.c
 )  
 
 set(INCL_BSP ${BSP_DIR})

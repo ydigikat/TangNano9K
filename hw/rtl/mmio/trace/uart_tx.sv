@@ -16,6 +16,16 @@ module uart_tx (
   output      logic         tx_o
 );
 
+//-----------------------------------------------------------------------------
+// States
+//-----------------------------------------------------------------------------
+typedef enum logic[2:0] 
+{  
+  Idle,
+  Start,
+  Data,
+  Stop
+} uart_state_t;
 
 //------------------------------------------------------------------------------
 // State registers
@@ -45,7 +55,10 @@ always_ff @(posedge clk_i) begin
 end
 
 //------------------------------------------------------------------------------
-// Sample count divider. 
+// Sample count divider. This generates pulses at 16 x the Baud rate, these are
+// used to time the length of the transmitted data bits.  The receiving UART
+// will sample them at the same rate.  This is often referred to as a baud
+// rate generator.
 //------------------------------------------------------------------------------
 always_ff @(posedge clk_i) begin
   if(!rst_ni) sample_div <= 0;
@@ -57,7 +70,7 @@ assign sample_div_next = (sample_div == div_i) ? 11'd0 : sample_div + 11'd1;
 assign sample_inc = (sample_div == div_i);
 
 //------------------------------------------------------------------------------
-// Next state logic 
+// Next state logic, this drives the state machine.
 //------------------------------------------------------------------------------
 always_comb begin
   state_next = state;
@@ -68,7 +81,7 @@ always_comb begin
 
   unique case(state) 
     
-    // Hold line high until we get a start signal.
+    // Hold line high until we get a start request from the caller.
     Idle: begin
       tx_next = 1'b1;
       if(tx_start_i) begin
@@ -78,7 +91,7 @@ always_comb begin
       end
     end
 
-    // Send start bit, low for 15 samples.
+    // Send start bit by holding the line low for 15 samples.
     Start: begin
       tx_next = 1'b0;
       if(sample_inc) begin
@@ -92,7 +105,7 @@ always_comb begin
       end
     end
     
-    // Data bits
+    // Shift out the data bits, every 16 samples
     Data: begin
       tx_next = data[0];
       if(sample_inc) begin
@@ -111,7 +124,7 @@ always_comb begin
       end
     end
     
-    // Stop bit, lasts for 15 samples.
+    // Signal stop bit, this lasts for 16 samples.
     Stop: begin
       tx_next = 1'b1;
       if(sample_inc) begin
@@ -123,6 +136,7 @@ always_comb begin
       end
     end
 
+    // Avoid latches
     default:state_next = state;
 
   endcase
@@ -132,7 +146,7 @@ end
 // outputs
 //------------------------------------------------------------------------------
 assign tx_o = tx;
-assign tx_done_o = (state == Idle);
+assign tx_done_o = (state == Idle);       // If we're idle then we're also done.
 
 endmodule
 

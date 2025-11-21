@@ -9,7 +9,7 @@
 /* Configuration */
 #define MCU_FREQ (16000000UL)
 #define SYS_FREQ (48000000UL)
-#define TRACE_DIV (25UL)      /* SYS_FREQ/(115200*16)-1 = 25 */
+
 
 /* Bit helpers */
 #define SET_BIT(REG, BIT) ((REG) |= (BIT))
@@ -50,7 +50,7 @@ typedef struct
 typedef struct 
 {
   __IO uint32_t CR;    /* Control register */
-  __I  uint32_t WD;    /* Write data */
+  __IO  uint32_t WD;    /* Write data */
   __O  uint32_t RD;    /* Read data */
 } I2C_t;
 
@@ -60,16 +60,16 @@ typedef struct
 #define PERIPH_BASE (0x80000000UL)
 
 /* MMIO base addresses */
-#define GPO_BASE (PERIPH_BASE + 0x00UL)
+#define GPO1_BASE (PERIPH_BASE + 0x00UL)
 #define TRACE_BASE (PERIPH_BASE + 0x40UL)
-#define TIMER_BASE (PERIPH_BASE + 0x80UL)
-#define I2C_BASE (PERIPH_BASE + 0xC0UL)
+#define TIMER1_BASE (PERIPH_BASE + 0x80UL)
+#define I2C1_BASE (PERIPH_BASE + 0xC0UL)
 
 /* MMIO declarations */
-#define GPO ((GPO_t *) GPO_BASE)
+#define GPO1 ((GPO_t *) GPO1_BASE)
 #define TRACE ((TRACE_t *) TRACE_BASE)
-#define TIMER ((TIMER_t *) TIMER_BASE)
-#define I2C ((I2C_t *)) I2C_BASE)
+#define TIMER1 ((TIMER_t *) TIMER1_BASE)
+#define I2C1 ((I2C_t *) I2C1_BASE)
 
 
 /* ----- GPO REGISTERS ----------------------------------------------------------------- */
@@ -173,12 +173,12 @@ typedef struct
 #define I2C_RD_DATA_Pos (0U)                        /* 0x000000FF */
 #define I2C_RD_DATA_Msk (0xFFUL)                    /* [7:0] data */
 #define I2C_RD_DATA (I2C_RD_DATA_Msk)
-#define I2C_WD_RDY_Pos (8U)                         /* 0x00000100 */
-#define I2C_WD_RDY_Msk (0x01UL)                     /* [8] ready */
-#define I2C_WD_RDY (I2C_WD_RDY_Msk)
-#define I2C_WD_ACK_Pos (9U)                         /* 0x00000200 */
-#define I2C_WD_ACK_Msk (0x01UL)                     /* [9] ack bit */
-#define I2C_WD_ACK (I2C_WD_ACK_Msk)
+#define I2C_RD_RDY_Pos (8U)                         /* 0x00000100 */
+#define I2C_RD_RDY_Msk (0x01UL)                     /* [8] ready */
+#define I2C_RD_RDY (I2C_RD_RDY_Msk)
+#define I2C_RD_ACK_Pos (9U)                         /* 0x00000200 */
+#define I2C_RD_ACK_Msk (0x01UL)                     /* [9] ack bit */
+#define I2C_RD_ACK (I2C_RD_ACK_Msk)
 
 #endif /* __BSP_H__ */
 

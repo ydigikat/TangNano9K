@@ -52,11 +52,14 @@ localparam TIM_BASE =   PERIPH_BASE_ADDR  +'h80;
 localparam I2C_BASE =   PERIPH_BASE_ADDR  +'hC0;          
 
 //------------------------------------------------------------------------------
-// PicoRV32 RISC V soft core processor (https://github.com/YosysHQ/picorv32)
+// PicoRV32 RISC V soft core processor 
 //------------------------------------------------------------------------------
 picorv32 #(
   .STACKADDR(SRAM_SIZE-4),   
-  .PROGADDR_RESET(32'h00000000)  
+  .PROGADDR_RESET(32'h00000000),  
+  .ENABLE_DIV(1),
+  .ENABLE_MUL(1),
+  .BARREL_SHIFTER(1)
 ) mcu (
   .clk(clk_mcu_i),
   .resetn(rst_mcu_ni),
@@ -196,19 +199,19 @@ timer #(.MCU_FREQ(MCU_FREQ)) tim
 //------------------------------------------------------------------------------
 // I2C module
 //------------------------------------------------------------------------------
-i2c_master im
-(
-  .clk_i(clk_i),
-  .rst_ni(rst_ni),
-  .clk_mcu_i(clk_mcu_i),                
-  .rst_mcu_ni(rst_mcu_ni),  
-  .select_i(i2c_sel),  
-  .mem_ready_o(i2c_rdy),
-  .mem_addr_i(mem_addr),
-  .mem_wstrb_i(mem_wstrb),
-  .mem_wdata_i(mem_wdata),
-  .mem_rdata_o(i2c_rdata)
-);
+// i2c_master im
+// (
+//   .clk_i(clk_i),
+//   .rst_ni(rst_ni),
+//   .clk_mcu_i(clk_mcu_i),                
+//   .rst_mcu_ni(rst_mcu_ni),  
+//   .select_i(i2c_sel),  
+//   .mem_ready_o(i2c_rdy),
+//   .mem_addr_i(mem_addr),
+//   .mem_wstrb_i(mem_wstrb),
+//   .mem_wdata_i(mem_wdata),
+//   .mem_rdata_o(i2c_rdata)
+// );
 
 //------------------------------------------------------------------------------
 // Logic analyser outputs

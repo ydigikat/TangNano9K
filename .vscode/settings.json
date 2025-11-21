@@ -28,6 +28,7 @@
   "cmake.sourceDirectory": "/workspaces/tangnano9k/sw",
   "cmake.ignoreCMakeListsMissing": true,
   "files.associations": {
-    "stddef.h": "c"
+    "stddef.h": "c",
+    "drv.h": "c"
   }
 }
