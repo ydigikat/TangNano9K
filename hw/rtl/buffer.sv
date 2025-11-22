@@ -9,15 +9,15 @@ module buffer #(
     parameter unsigned DATA_WIDTH=8,
     parameter unsigned BUF_ADDR_SIZE=$clog2(BUF_SIZE)
 ) (
-    input `VAR logic                   clk_i,
-    input `VAR logic                   rst_ni,
+    input `VAR logic                  clk_i,
+    input `VAR logic                  rst_ni,
 
-    input `VAR logic                   wr_i, rd_i,
-    input `VAR logic[DATA_WIDTH-1:0]   wdata_i,
-    output logic[DATA_WIDTH-1:0]       rdata_o,
+    input `VAR logic                  wr_i, rd_i,
+    input `VAR logic [DATA_WIDTH-1:0] wdata_i,
+    output     logic [DATA_WIDTH-1:0] rdata_o,
 
-    output logic                      empty_o,
-    output logic                      full_o
+    output     logic                  empty_o,
+    output     logic                  full_o
 );
 
 
@@ -25,9 +25,9 @@ module buffer #(
   typedef logic [BUF_ADDR_SIZE-1:0] buf_ptr_t;
 
   logic [DATA_WIDTH-1:0] buffer[BUF_SIZE];
-  buf_ptr_t head, head_next;
-  buf_ptr_t tail, tail_next;
-  logic full_flag, full_flag_next;
+  buf_ptr_t head, head_d;
+  buf_ptr_t tail, tail_d;
+  logic full, full_d;
 
   //-----------------------------------------------------------------------------
   // State registers
@@ -36,11 +36,11 @@ module buffer #(
     if (!rst_ni) begin
       head <= 0;
       tail <= 0;
-      full_flag <= 0;
+      full <= 0;
     end else begin
-      head <= head_next;
-      tail <= tail_next;
-      full_flag <= full_flag_next;
+      head <= head_d;
+      tail <= tail_d;
+      full <= full_d;
     end
   end
 
@@ -57,20 +57,20 @@ module buffer #(
   // Next state logic
   //-----------------------------------------------------------------------------
   always_comb begin
-    head_next = head;
-    tail_next = tail;
-    full_flag_next = full_flag;
+    head_d = head;
+    tail_d = tail;
+    full_d = full;
 
     if (wr_i && !full_o) begin
-      head_next = head + 1;  // Natural wraparound for power-of-2 sizes
-      if (head_next == tail && !rd_i) begin
-        full_flag_next = 1;
+      head_d = head + 1'd1;  
+      if (head_d == tail && !rd_i) begin
+        full_d = 1;
       end
     end
 
     if (rd_i && !empty_o) begin
-      tail_next = tail + 1;  // Natural wraparound for power-of-2 sizes
-      full_flag_next = 0;
+      tail_d = tail + 1'd1;  
+      full_d = 0;
     end
   end
 
@@ -78,8 +78,8 @@ module buffer #(
   // Output logic
   //-----------------------------------------------------------------------------
   assign rdata_o = buffer[tail];
-  assign empty_o = (head == tail) && !full_flag;
-  assign full_o = full_flag;
+  assign empty_o = (head == tail) && !full;
+  assign full_o = full;
 
 endmodule
 

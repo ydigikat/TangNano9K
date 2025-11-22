@@ -166,6 +166,8 @@ set RTL_FILES [list \
     "$RTL_DIR/buffer.sv" \
     "$RTL_DIR/picorv32.v" \
     "$RTL_DIR/soc.sv" \
+    "$RTL_DIR/audio/i2s_tx.sv" \
+    "$RTL_DIR/audio/test_tone.sv" \
     "$RTL_DIR/mmio/trace/trace.sv" \
     "$RTL_DIR/mmio/trace/uart_tx.sv" \
     "$RTL_DIR/mmio/midi/uart_rx.sv" \

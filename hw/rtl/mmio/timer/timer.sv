@@ -60,7 +60,7 @@ always @(posedge clk_mcu_i) begin
         run  <= run_next;
         clear <= clear_next;
 
-        // Latch counter on LO read for 64-bit access (convention)
+        // Latch counter on LO reg read for 64-bit access
         if(rd_lo) us_cnt_latch <= us_cnt;
     end
 end
@@ -73,7 +73,7 @@ always_comb begin
     us_cnt_next = us_cnt;
 
     run_next = wr_cr ? mem_wdata_i[0] : run;
-    clear_next = wr_cr ? mem_wdata_i[1] : 1'b0; // Auto clear
+    clear_next = wr_cr ? mem_wdata_i[1] : 1'b0;    // Clear should not be sticky.
 
     if(clear) begin
         us_cnt_next = 0;

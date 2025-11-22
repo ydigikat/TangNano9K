@@ -1,152 +1,135 @@
 //------------------------------------------------------------------------------
 // Jason Wilden 2025
 //------------------------------------------------------------------------------
-// Non parametric UART, 8N1
-//------------------------------------------------------------------------------
 `default_nettype none
 `include "../../common_defs.svh"
 
 module uart_tx (
-  input `VAR  logic         clk_i,
-  input `VAR  logic         rst_ni,
-  input `VAR  logic[10:0]   div_i,
-  input `VAR  logic[7:0]    data_i,
-  input `VAR  logic         tx_start_i,
-  output      logic         tx_done_o, 
-  output      logic         tx_o
+  input  `VAR logic        clk_i,
+  input  `VAR logic        rst_ni,
+  input  `VAR logic [10:0] div_i,
+  input  `VAR logic [7:0]  data_i,
+  input  `VAR logic        tx_start_i,
+  output      logic        tx_done_o,
+  output      logic        tx_o
 );
 
-//-----------------------------------------------------------------------------
-// States
-//-----------------------------------------------------------------------------
-typedef enum logic[2:0] 
-{  
+//------------------------------------------------------------------------------
+// State machine encoding
+//------------------------------------------------------------------------------
+typedef enum logic [2:0] 
+{
   Idle,
   Start,
   Data,
   Stop
 } uart_state_t;
 
-//------------------------------------------------------------------------------
-// State registers
-//------------------------------------------------------------------------------
-uart_state_t state, state_next;
-logic[10:0] sample_div, sample_div_next;
-logic[3:0] sample_cnt, sample_cnt_next;
-logic[2:0] bit_cnt, bit_cnt_next;
-logic[7:0] data, data_next;
+uart_state_t state, state_d;
 
-logic tx, tx_next;
+//------------------------------------------------------------------------------
+// Registers
+//------------------------------------------------------------------------------
+logic [10:0] sample_div, sample_div_d;
+logic [3:0]  sample_cnt, sample_cnt_d;
+logic [2:0]  bit_cnt, bit_cnt_d;
+logic [7:0]  data, data_d;
+
+// Output register
+logic tx, tx_d;
 
 always_ff @(posedge clk_i) begin
-  if(!rst_ni) begin
-    state <= Idle;
-    bit_cnt <= 0;
-    sample_cnt <= 0;
-    data <= 0;    
-    tx <= 1'b1;
+  if (!rst_ni) begin    
+    state      <= Idle;
+    bit_cnt    <= '0;
+    sample_cnt <= '0;
+    data       <= '0;
+    sample_div <= '0;
+    tx         <= 1'b1;
   end else begin
-    state <= state_next;
-    bit_cnt <= bit_cnt_next;
-    sample_cnt <= sample_cnt_next;
-    data <= data_next;
-    tx <= tx_next;
+    state      <= state_d;
+    bit_cnt    <= bit_cnt_d;
+    sample_cnt <= sample_cnt_d;
+    data       <= data_d;
+    sample_div <= sample_div_d;
+    tx         <= tx_d;
   end
 end
 
 //------------------------------------------------------------------------------
-// Sample count divider. This generates pulses at 16 x the Baud rate, these are
-// used to time the length of the transmitted data bits.  The receiving UART
-// will sample them at the same rate.  This is often referred to as a baud
-// rate generator.
+// Sample rate divider
 //------------------------------------------------------------------------------
-always_ff @(posedge clk_i) begin
-  if(!rst_ni) sample_div <= 0;
-  else sample_div <= sample_div_next;
-end
-
 logic sample_inc;
-assign sample_div_next = (sample_div == div_i) ? 11'd0 : sample_div + 11'd1;
-assign sample_inc = (sample_div == div_i);
+assign sample_inc   = (sample_div == div_i);
+assign sample_div_d = sample_inc ? 11'd0 : (sample_div + 11'd1);
+
 
 //------------------------------------------------------------------------------
-// Next state logic, this drives the state machine.
+// Next-state / Output logic
 //------------------------------------------------------------------------------
 always_comb begin
-  state_next = state;
-  bit_cnt_next = bit_cnt;
-  sample_cnt_next = sample_cnt;
-  data_next = data;
-  tx_next = tx;  
+  // Default hold
+  state_d      = state;
+  bit_cnt_d    = bit_cnt;
+  sample_cnt_d = sample_cnt;
+  data_d       = data;
+  tx_d         = tx;
 
-  unique case(state) 
-    
-    // Hold line high until we get a start request from the caller.
+  unique case (state)
+    // Idle — wait for tx_start_i, keep line high
     Idle: begin
-      tx_next = 1'b1;
-      if(tx_start_i) begin
-        state_next = Start;
-        sample_cnt_next = 0;
-        data_next = data_i;
+      tx_d = 1'b1;
+      if (tx_start_i) begin
+        state_d      = Start;
+        sample_cnt_d = 4'd0;
+        data_d   = data_i;
       end
     end
-
-    // Send start bit by holding the line low for 15 samples.
+    // Start bit — hold low for 16 samples
     Start: begin
-      tx_next = 1'b0;
-      if(sample_inc) begin
-        if(sample_cnt == 'd15) begin
-          state_next = Data;
-          sample_cnt_next = 0;
-          bit_cnt_next = 0;
+      tx_d = 1'b0;
+      if (sample_inc) begin
+        if (sample_cnt == 4'd15) begin
+          state_d      = Data;
+          sample_cnt_d = 4'd0;
+          bit_cnt_d    = 3'd0;
         end else begin
-          sample_cnt_next = sample_cnt + 1'b1;
+          sample_cnt_d = sample_cnt + 1'd1;
         end
       end
     end
-    
-    // Shift out the data bits, every 16 samples
+    // Data bits — shift out LSB-first, 16 samples per bit
     Data: begin
-      tx_next = data[0];
-      if(sample_inc) begin
-        if(sample_cnt == 'd15) begin
-          sample_cnt_next = 0;
-          data_next = data >> 1'b1;
-
-          if(bit_cnt == 7) begin
-            state_next = Stop;
-          end else begin
-            bit_cnt_next = bit_cnt + 1'b1;
-          end
+      tx_d = data[0];
+      if (sample_inc) begin
+        if (sample_cnt == 4'd15) begin
+          sample_cnt_d = 4'd0;
+          data_d   = {1'b0, data[7:1]};        
+          if (bit_cnt == 3'd7) state_d = Stop;
+          else bit_cnt_d = bit_cnt + 1'd1;
         end else begin
-          sample_cnt_next = sample_cnt + 1'b1;
+          sample_cnt_d = sample_cnt + 1'd1;
         end
       end
     end
-    
-    // Signal stop bit, this lasts for 16 samples.
+    // Stop bit — high for 16 samples
     Stop: begin
-      tx_next = 1'b1;
-      if(sample_inc) begin
-        if(sample_cnt == 'd15) begin
-          state_next = Idle;          
-        end else begin
-          sample_cnt_next = sample_cnt + 1'b1;
-        end
+      tx_d = 1'b1;
+      if (sample_inc) begin
+        if (sample_cnt == 4'd15) state_d = Idle;
+        else sample_cnt_d = sample_cnt + 1'd1;        
       end
     end
-
-    // Avoid latches
-    default:state_next = state;
-
+    default: begin
+    end
   endcase
 end
 
 //------------------------------------------------------------------------------
-// outputs
+// Outputs
 //------------------------------------------------------------------------------
-assign tx_o = tx;
-assign tx_done_o = (state == Idle);       // If we're idle then we're also done.
+assign tx_o      = tx;
+assign tx_done_o = (state == Idle);
 
 endmodule
 
