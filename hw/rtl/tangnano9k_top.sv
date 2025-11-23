@@ -11,7 +11,7 @@ module tangnano9k_top (
     input `VAR  logic        midi_i,
     output      logic[4:0]   led_o,    
     output      logic        led_trap_o,    
-    output      logic        i2c_scl_o,
+    inout       tri          i2c_scl_io,
     inout       tri          i2c_sda_io,
 
     output      logic[15:0]  dio_o 
@@ -60,7 +60,9 @@ module tangnano9k_top (
     .trace_o(ftdi_o),    
     .midi_i(midi_i),
     .dio_o(dio_o),
-    .gpo_o(gpo)
+    .gpo_o(gpo),
+    .i2c_scl_io(i2c_scl_io),
+    .i2c_sda_io(i2c_sda_io)
   );
 
 

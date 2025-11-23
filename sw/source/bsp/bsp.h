@@ -50,8 +50,9 @@ typedef struct
 typedef struct 
 {
   __IO uint32_t CR;    /* Control register */
-  __IO  uint32_t WD;    /* Write data */
-  __O  uint32_t RD;    /* Read data */
+  __I  uint32_t SR;    /* Status register */ 
+  __IO uint32_t TX;    /* Write data */
+  __O  uint32_t RX;    /* Read data */
 } I2C_t;
 
 
@@ -132,17 +133,17 @@ typedef struct
 #define TRACE_CR_DIV (TRACE_CR_DIV_Msk)                /* [10:0] divisor */
 
 /* Status register */
-#define TRACE_SR_TDR_Pos (0U)
-#define TRACE_SR_TDR_Msk (0x1UL << TRACE_SR_TDR_Pos) /* 0x00000001 */
-#define TRACE_SR_TDR (TRACE_SR_TDR_Msk)              /* [0] Ready for TX */
-#define TRACE_SR_RDR_Pos (1U)
-#define TRACE_SR_RDR_Msk (0x1UL << TRACE_SR_RDR_Pos) /* 0x00000002 */
-#define TRACE_SR_RDR (TRACE_SR_RDR_Msk)              /* [1] Ready for RX */
+#define TRACE_SR_TXRDY_Pos (0U)
+#define TRACE_SR_TXRDY_Msk (0x1UL << TRACE_SR_TXRDY_Pos) /* 0x00000001 */
+#define TRACE_SR_TXRDY (TRACE_SR_TXRDY_Msk)              /* [0] Ready for TX */
+#define TRACE_SR_RXRDY_Pos (1U)
+#define TRACE_SR_RXRDY_Msk (0x1UL << TRACE_SR_RXRDY_Pos) /* 0x00000002 */
+#define TRACE_SR_RXRDY (TRACE_SR_RXRDY_Msk)              /* [1] Ready for RX */
 
 /* Data register, serial data out */
-#define TRACE_TD_DB_Pos (0U)
-#define TRACE_TD_DB_Msk (0xFFUL << TRACE_TD_DB_Pos)  /* 0x000000FF*/
-#define TRACE_TD_DB (TRACE_TD_DB_Msk)                /* [7:0] output data byte */
+#define TRACE_TX_DAT_Pos (0U)
+#define TRACE_TX_DAT_Msk (0xFFUL << TRACE_TX_DAT_Pos)  /* 0x000000FF*/
+#define TRACE_TX_DAT (TRACE_TX_DAT_Msk)                /* [7:0] output data byte */
 
 /* ----- TIMER REGISTERS ----------------------------------------------------------------- */
 
@@ -157,28 +158,32 @@ typedef struct
 /* ----- I2C REGISTERS ----------------------------------------------------------------- */
 
 /* Control register */
-#define I2C_CR_DIV_Pos (0U)
-#define I2C_CR_DIV_Msk (0xFFFFUL << I2C_CR_DIV_Pos) /* 0x0000FFFF */
-#define I2C_CR_DIV (I2C_CR_DIV_Msk)                 /* [15:0] divisor (2**16)-1 = FFFF*/
+#define I2C_CR_DEVADDR_Pos (0U)
+#define I2C_CR_DEVADDR_Msk (0xFFFFUL << I2C_CR_DEVADDR_Pos) /* 0x0000003F */
+#define I2C_CR_DEVADDR (I2C_CR_DEVADDR_Msk)                 /* [6:0] device address */
+#define I2C_CR_RW_Pos (7U)                  
+#define I2C_CR_RW_Msk (0x1UL << I2C_CR_RW_Pos)              /* [7] 0=write, 1=read */
+#define I2C_CR_RW (I2C_CR_RW_Msk)
 
-/* Write register */
-#define I2C_WD_DATA_Pos (0U)                        /* 0x000000FF */
-#define I2C_WD_DATA_Msk (0xFFUL)                    /* [7:0] data */
-#define I2C_WD_DATA (I2C_WD_DATA_Msk)
-#define I2C_WD_CMD_Pos (8U)                         /* 0x00000100 */
-#define I2C_WD_CMD_Msk (0x07UL)                     /* [10:8] command */
-#define I2C_WD_CMD (I2C_WD_CMD)
+/* Status register */
+#define I2C_SR_BUSY_Pos (0U)
+#define I2C_SR_BUSY_Msk (0x01 << I2C_SR_BUSY_Pos)           
+#define I2C_SR_BUSY (I2C_SR_BUSY_Msk)                       /* [0] busy*/
+#define I2C_SR_DONE_Pos (01U)
+#define I2C_SR_DONE_Msk (0x01 << I2C_SR_DONE_Pos)           /* [1] done */
+#define I2C_SR_DONE (I2C_SR_DONE_Msk)
+#define I2C_SR_ERR_Pos (02U)                                /* [2] ack error */
+#define I2C_SR_ERR_Msk (0x01 << I2C_SR_ERR_Pos)
+#define I2C_SR_ERR (I2C_SR_ERR_Msk)
 
-/* Read register */
-#define I2C_RD_DATA_Pos (0U)                        /* 0x000000FF */
-#define I2C_RD_DATA_Msk (0xFFUL)                    /* [7:0] data */
-#define I2C_RD_DATA (I2C_RD_DATA_Msk)
-#define I2C_RD_RDY_Pos (8U)                         /* 0x00000100 */
-#define I2C_RD_RDY_Msk (0x01UL)                     /* [8] ready */
-#define I2C_RD_RDY (I2C_RD_RDY_Msk)
-#define I2C_RD_ACK_Pos (9U)                         /* 0x00000200 */
-#define I2C_RD_ACK_Msk (0x01UL)                     /* [9] ack bit */
-#define I2C_RD_ACK (I2C_RD_ACK_Msk)
+#define I2C_TX_DAT_Pos (0U)
+#define I2C_TX_DAT_Msk (0xFFUL << TRACE_TX_DAT_Pos)         /* 0x000000FF*/
+#define I2C_TX_DAT (TRACE_TX_DAT_Msk)                       /* [7:0] output data byte */
+
+#define I2C_RX_DAT_Pos (0U)
+#define I2C_RX_DAT_Msk (0xFFUL << TRACE_RX_DAT_Pos)         /* 0x000000FF*/
+#define I2C_RX_DAT (TRACE_RX_DAT_Msk)                       /* [7:0] output data byte */
+
 
 #endif /* __BSP_H__ */
 

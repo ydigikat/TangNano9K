@@ -16,18 +16,21 @@ module soc #( parameter WORD_ADDRESS_WIDTH,
                     B2_MEM_FILE,
                     B3_MEM_FILE)
 (
-  input `VAR logic clk_i,           // 48MHz system clock
-  input `VAR logic rst_ni,
-  input `VAR logic clk_mcu_i,       // 16MHz MCU clock
-  input `VAR logic rst_mcu_ni,  
+  input `VAR logic       clk_i,    
+  input `VAR logic       rst_ni,
+  input `VAR logic       clk_mcu_i,       
+  input `VAR logic       rst_mcu_ni,  
 
-  output logic trap_o,
+  output     logic       trap_o,
 
-  output logic[15:0] gpo_o,  
-  output logic trace_o,    
-  input  `VAR logic midi_i,
+  output     logic[15:0] gpo_o,        
+  output     logic       trace_o,    
+  input `VAR logic       midi_i,
 
-  output logic[15:0] dio_o  
+  inout      tri         i2c_sda_io,
+  inout      tri         i2c_scl_io,
+
+  output     logic[15:0] dio_o  
 );
 
 //------------------------------------------------------------------------------
@@ -199,19 +202,21 @@ timer #(.MCU_FREQ(MCU_FREQ)) tim
 //------------------------------------------------------------------------------
 // I2C module
 //------------------------------------------------------------------------------
-// i2c_master im
-// (
-//   .clk_i(clk_i),
-//   .rst_ni(rst_ni),
-//   .clk_mcu_i(clk_mcu_i),                
-//   .rst_mcu_ni(rst_mcu_ni),  
-//   .select_i(i2c_sel),  
-//   .mem_ready_o(i2c_rdy),
-//   .mem_addr_i(mem_addr),
-//   .mem_wstrb_i(mem_wstrb),
-//   .mem_wdata_i(mem_wdata),
-//   .mem_rdata_o(i2c_rdata)
-// );
+i2c ic
+(
+  .clk_i(clk_i),
+  .rst_ni(rst_ni),
+  .clk_mcu_i(clk_mcu_i),                
+  .rst_mcu_ni(rst_mcu_ni),  
+  .select_i(i2c_sel),  
+  .sda_io(i2c_sda_io),
+  .scl_io(i2c_scl_io),
+  .mem_ready_o(i2c_rdy),
+  .mem_addr_i(mem_addr),
+  .mem_wstrb_i(mem_wstrb),
+  .mem_wdata_i(mem_wdata),
+  .mem_rdata_o(i2c_rdata)
+);
 
 //------------------------------------------------------------------------------
 // Logic analyser outputs

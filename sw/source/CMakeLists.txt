@@ -20,16 +20,17 @@ set(SRCS_BSP
   ${BSP_DIR}/trace.c
   ${BSP_DIR}/runtime.c
   ${BSP_DIR}/startup.s
-  ${BSP_DIR}/board.c
-  ${BSP_DIR}/i2c.c
+  ${BSP_DIR}/board.c  
 )  
 
 set(INCL_BSP ${BSP_DIR})
 
+set(DEFS_BSP USE_HIGH_LEVEL_DRIVERS)
+
 # Build targets
 add_executable(${TARGET} ${SRCS_APP} ${SRCS_BSP})
 target_include_directories(${TARGET} PRIVATE ${INCL_APP} ${INCL_BSP})
-target_compile_definitions(${TARGET} PRIVATE ${DEFS_APP})
+target_compile_definitions(${TARGET} PRIVATE ${DEFS_APP} ${DEFS_BSP})
 target_link_options(${TARGET} PRIVATE -T ${BSP_DIR}/linker.lds)
 target_link_libraries(${TARGET} PRIVATE gcc)  
 

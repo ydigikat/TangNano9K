@@ -56,19 +56,19 @@ module clock_gen (
 
 
   // State registers
-  logic [3:0] rst, rst_next,rst_mcu,rst_mcu_next;
+  logic [3:0] rst, rst_d,rst_mcu,rst_mcu_d;
 
-  always_ff @(posedge clk) rst <= rst_next;  
-  always_ff @(posedge clk_mcu) rst_mcu <= rst_mcu_next;
+  always_ff @(posedge clk) rst <= rst_d;  
+  always_ff @(posedge clk_mcu) rst_mcu <= rst_mcu_d;
 
   // Next state logic
   always_comb begin
-    rst_next = 4'b0;    
-    rst_mcu_next = 4'b0;
+    rst_d = 4'b0;    
+    rst_mcu_d = 4'b0;
 
     if (pll_locked) begin
-      rst_next = {rst[2:0], 1'b1};      
-      rst_mcu_next = {rst_mcu[2:0], 1'b1};
+      rst_d = {rst[2:0], 1'b1};      
+      rst_mcu_d = {rst_mcu[2:0], 1'b1};
     end
   end
 

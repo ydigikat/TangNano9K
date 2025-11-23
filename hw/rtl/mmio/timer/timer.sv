@@ -42,11 +42,11 @@ assign rd_hi = (select_i && (mem_addr_i[5:2] == HI));
 //------------------------------------------------------------------------------
 // State registers
 //------------------------------------------------------------------------------
-logic[CYCLEW-1:0] cycle_cnt, cycle_cnt_next;
-logic[63:0] us_cnt, us_cnt_next, us_cnt_latch;
+logic[CYCLEW-1:0] cycle_cnt, cycle_cnt_d;
+logic[63:0] us_cnt, us_cnt_d, us_cnt_latch;
 
-logic run, run_next;
-logic clear, clear_next;
+logic run, run_d;
+logic clear, clear_d;
 
 always @(posedge clk_mcu_i) begin
     if(!rst_mcu_ni) begin
@@ -55,10 +55,10 @@ always @(posedge clk_mcu_i) begin
         run <= 0;
         clear <= 0;
     end else begin
-        cycle_cnt <= cycle_cnt_next;
-        us_cnt <= us_cnt_next;
-        run  <= run_next;
-        clear <= clear_next;
+        cycle_cnt <= cycle_cnt_d;
+        us_cnt <= us_cnt_d;
+        run  <= run_d;
+        clear <= clear_d;
 
         // Latch counter on LO reg read for 64-bit access
         if(rd_lo) us_cnt_latch <= us_cnt;
@@ -69,25 +69,25 @@ end
 // Next state logic
 //------------------------------------------------------------------------------
 always_comb begin    
-    cycle_cnt_next = cycle_cnt;
-    us_cnt_next = us_cnt;
+    cycle_cnt_d = cycle_cnt;
+    us_cnt_d = us_cnt;
 
-    run_next = wr_cr ? mem_wdata_i[0] : run;
-    clear_next = wr_cr ? mem_wdata_i[1] : 1'b0;    // Clear should not be sticky.
+    run_d = wr_cr ? mem_wdata_i[0] : run;
+    clear_d = wr_cr ? mem_wdata_i[1] : 1'b0;    // Clear should not be sticky.
 
     if(clear) begin
-        us_cnt_next = 0;
-        cycle_cnt_next = 0;
+        us_cnt_d = 0;
+        cycle_cnt_d = 0;
     end else begin 
         if(run) begin
             if(cycle_cnt == CYCLES_PER_US -1) begin
-                cycle_cnt_next = 0;
-                us_cnt_next = us_cnt + 1'b1;
+                cycle_cnt_d = 0;
+                us_cnt_d = us_cnt + 1'b1;
             end else begin
-                cycle_cnt_next = cycle_cnt+1'b1;
+                cycle_cnt_d = cycle_cnt+1'b1;
             end
         end else begin
-            cycle_cnt_next = 0;     
+            cycle_cnt_d = 0;     
         end
     end
 end
