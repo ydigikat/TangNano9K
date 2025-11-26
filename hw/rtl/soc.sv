@@ -108,7 +108,8 @@ assign sram_sel =  mem_valid && (mem_addr  < SRAM_SIZE);
 assign gpo_sel =   mem_valid && (mem_addr >= GPO_BASE && mem_addr < UART_BASE);
 assign uart_sel = mem_valid && (mem_addr >= UART_BASE && mem_addr < TIM_BASE);
 assign timer_sel = mem_valid && (mem_addr >= TIM_BASE && mem_addr < I2C_BASE);
-assign i2c_sel = mem_valid && (mem_addr >= I2C_BASE && mem_addr < I2C_BASE + 'h40);
+//assign i2c_sel = mem_valid && (mem_addr >= I2C_BASE && mem_addr < I2C_BASE + 'h40);
+assign i2c_sel = 0;
 
 //------------------------------------------------------------------------------
 // Read data multiplexing
@@ -201,7 +202,7 @@ timer #(.MCU_FREQ(MCU_FREQ)) tim
 
 //------------------------------------------------------------------------------
 // I2C module
-//------------------------------------------------------------------------------
+// //------------------------------------------------------------------------------
 i2c ic
 (
   .clk_i(clk_i),
@@ -209,19 +210,26 @@ i2c ic
   .clk_mcu_i(clk_mcu_i),                
   .rst_mcu_ni(rst_mcu_ni),  
   .select_i(i2c_sel),  
-  .sda_io(i2c_sda_io),
-  .scl_io(i2c_scl_io),
   .mem_ready_o(i2c_rdy),
   .mem_addr_i(mem_addr),
   .mem_wstrb_i(mem_wstrb),
   .mem_wdata_i(mem_wdata),
-  .mem_rdata_o(i2c_rdata)
+  .mem_rdata_o(i2c_rdata),
+
+  .sda_io(i2c_sda_io),
+  .scl_io(i2c_scl_io)
 );
 
 //------------------------------------------------------------------------------
 // Logic analyser outputs
 //------------------------------------------------------------------------------
-assign dio_o = {15'h0,trace_o};
+assign dio_o[15:8] = mem_addr[7:0];
+assign dio_o[7] = mem_addr[31];
+assign dio_o[4] = timer_sel;
+assign dio_o[3] = uart_sel;
+assign dio_o[2] = gpo_sel;
+assign dio_o[1] = sram_sel;
+assign dio_o[0] = i2c_sel;
 
 
 endmodule

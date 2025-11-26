@@ -64,12 +64,10 @@ always_ff @(posedge clk_mcu_i) begin
     rx_data     <= 8'd0;
     dev_addr    <= 7'd0;
     read_enable <= 1'b0;
-    start       <= 1'b0;
-    mem_ready_o <= 1'b0;
+    start       <= 1'b0;    
   end else begin
     // Defaults
-    start       <= 1'b0;
-    mem_ready_o <= 1'b1;    // MMIO is always single cycle
+    start       <= 1'b0;    
 
     // Write TX register
     if (wr_tx) begin
@@ -80,8 +78,7 @@ always_ff @(posedge clk_mcu_i) begin
     if (wr_cr && !busy) begin
       dev_addr    <= mem_wdata_i[6:0];
       read_enable <= mem_wdata_i[7];
-      start       <= 1'b1;
-      mem_ready_o <= 1'b0;
+      start       <= 1'b1;      
     end
 
     // Latch RX data
@@ -118,12 +115,10 @@ i2c_controller #(
 //------------------------------------------------------------------------------
 // Read MUX
 //------------------------------------------------------------------------------
-always_comb begin
-  case (mem_addr_i[5:2])
-    SR: mem_rdata_o = {29'b0, ack_error, done, busy}; // bit 2=NACK, bit1=done, bit0=busy
-    RX: mem_rdata_o = {24'b0, rx_data};               // Read data byte
-    default: mem_rdata_o = 32'b0;
-  endcase
-end
+assign mem_rdata_o = rd_sr ? {29'b0, ack_error, done, busy} :
+                     rd_rx ? {24'b0, rx_data} :
+                     32'b0;
+
+assign mem_ready_o = select_i;   // Single cycle response                     
 
 endmodule

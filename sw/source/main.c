@@ -9,7 +9,8 @@ int main(void)
 {  
   bool toggle = true;
 
-  board_init();
+  
+  board_init();  
 
   while (1)
   { 
