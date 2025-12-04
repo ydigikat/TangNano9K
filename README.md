@@ -5,7 +5,9 @@ This is a relatively perfunctory README as I assume anybody who is planning on b
 
 I do all my development on Linux so there is no Windows support here.
 
-The SOC uses the very lightweight Picorv32 soft-core processor created by Clifford Wolfe (Yosys).  It provides a limited set of MMIO peripherals as my primary puporse for this SOC is to manage simple control-plane functions for FPGA based digital synthesisers.
+The SOC uses the very lightweight Picorv32 soft-core processor created by Clifford Wolfe (Yosys).  
+
+To this, Ive added a limited set of MMIO peripherals as my primary purpose for this SOC is to manage simple control-plane functions for FPGA based digital synthesisers.
 
 The RV variant is the 32-bit RV32IMC which includes the hardware multiplier/divider, barrel shifter and compressed instruction set. I do not enable the custom IRQ mechanism provided by the MCU.
 
