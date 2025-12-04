@@ -43,7 +43,7 @@ logic [31:0] mem_addr;    // 32-bit byte address of memory accessed.
 logic [31:0] mem_wdata;   // 32-bit data to be written;
 logic [3:0]  mem_wstrb;   // Indicates active bytes in write data 0-3, 0+1, 2+3
 logic [31:0] mem_rdata;   // 32-bit data read.
-logic        trap;        // Indicates an untrapped processor fault.
+logic        trap;        // Indicates a processor trap/fault.
 
 //------------------------------------------------------------------------------
 // Memory map
